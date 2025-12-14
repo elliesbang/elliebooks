@@ -93,6 +93,7 @@ main {
   margin: 16px 0 12px;
   font-size: 2.8rem;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .hero .subtitle {
@@ -109,6 +110,17 @@ main {
 .hero__image {
   background: radial-gradient(circle at 30% 30%, rgba(254,245,104,0.35), transparent 40%),
     radial-gradient(circle at 70% 50%, rgba(255,255,255,0.08), transparent 35%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.hero__image img {
+  width: 100%;
+  max-width: 360px;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,0.25));
+  border-radius: 14px;
 }
 
 .section {
@@ -190,6 +202,34 @@ main {
 
 .process {
   margin-top: 20px;
+}
+
+.process-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.process-step {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+
+.process-step p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.process-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(254, 245, 104, 0.2);
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
 }
 
 .section--programs .card--program {
@@ -344,6 +384,72 @@ main {
 
 .info-card a {
   color: var(--text);
+  font-weight: 600;
+}
+
+.section--performance {
+  background: var(--background);
+}
+
+.card-grid--performance {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.performance-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: center;
+}
+
+.performance-media img {
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+}
+
+.performance-content h3 {
+  margin: 8px 0;
+}
+
+.performance-copy {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(254, 245, 104, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.purchase {
+  display: grid;
+  gap: 8px;
+}
+
+.purchase-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.purchase-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.purchase-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   font-weight: 600;
 }
 
