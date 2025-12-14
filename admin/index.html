@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>elliebooks 관리자 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__brand">
+        <span class="logo">elliebooks</span>
+        <p class="admin-muted">관리자 대시보드</p>
+      </div>
+      <nav class="admin-menu" id="admin-menu">
+        <button class="admin-menu__item is-active" data-target="dashboard">Dashboard</button>
+        <button class="admin-menu__item" data-target="books">Books</button>
+        <button class="admin-menu__item" data-target="hero">Hero Section</button>
+        <button class="admin-menu__item" data-target="results">Results Section</button>
+        <button class="admin-menu__item" data-target="library">Library Section</button>
+        <button class="admin-menu__item" data-target="inquiries">Inquiries</button>
+        <button class="admin-menu__item" data-target="settings">Site Settings</button>
+      </nav>
+      <button class="button ghost admin-logout" id="logout-button">로그아웃</button>
+    </aside>
+
+    <main class="admin-content">
+      <header class="admin-content__header">
+        <div>
+          <p class="eyebrow">ADMIN</p>
+          <h1>관리자 대시보드</h1>
+          <p class="admin-muted">책 관리와 노출 섹션을 분리하여 운영합니다.</p>
+        </div>
+        <div class="admin-user" id="admin-user"></div>
+      </header>
+
+      <section class="admin-section" data-section="dashboard">
+        <div class="admin-grid">
+          <article class="admin-card">
+            <h3>Books</h3>
+            <p class="admin-muted">등록된 책 정보의 저장소</p>
+            <p class="admin-metric" id="metric-books">-</p>
+          </article>
+          <article class="admin-card">
+            <h3>Hero Section</h3>
+            <p class="admin-muted">현재 노출 중인 책</p>
+            <p class="admin-metric" id="metric-hero">-</p>
+          </article>
+          <article class="admin-card">
+            <h3>Results Section</h3>
+            <p class="admin-muted">성과 노출 중인 책 수</p>
+            <p class="admin-metric" id="metric-results">-</p>
+          </article>
+          <article class="admin-card">
+            <h3>Library Section</h3>
+            <p class="admin-muted">서재 노출 책 수</p>
+            <p class="admin-metric" id="metric-library">-</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="books">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Books</p>
+            <h2>책 기본 정보 관리</h2>
+            <p class="admin-muted">Books에 등록만으로는 노출되지 않습니다.</p>
+          </div>
+          <button class="button secondary" id="new-book">새 책 추가</button>
+        </div>
+        <form class="admin-form admin-card admin-form--stacked" id="book-form">
+          <input type="hidden" name="id" id="book-id">
+          <div class="admin-form__grid">
+            <label>제목
+              <input type="text" name="title" id="book-title" required>
+            </label>
+            <label>저자
+              <input type="text" name="author" id="book-author" required>
+            </label>
+            <label>출판일
+              <input type="date" name="published_at" id="book-published">
+            </label>
+          </div>
+          <label>설명
+            <textarea name="description" id="book-description" rows="3" placeholder="책 소개를 입력하세요"></textarea>
+          </label>
+          <label>구매 링크 (한 줄에 플랫폼 | URL 형태로 입력)
+            <textarea name="book_links" id="book-links" rows="3" placeholder="교보문고 | https://..."></textarea>
+          </label>
+          <div class="admin-form__grid">
+            <label>표지 이미지 URL
+              <input type="url" name="cover_image_url" id="book-cover" placeholder="https://..." >
+            </label>
+            <label>표지 이미지 업로드 (book-covers 버킷)
+              <input type="file" id="book-cover-upload" accept="image/*">
+            </label>
+          </div>
+          <div class="admin-form__actions">
+            <button class="button primary" type="submit">저장</button>
+            <button class="button ghost" type="button" id="reset-book">초기화</button>
+          </div>
+          <p class="admin-error" id="book-error"></p>
+        </form>
+
+        <div class="admin-card">
+          <div class="admin-list__header">
+            <h3>등록된 책</h3>
+            <p class="admin-muted">노출은 섹션 관리에서 별도로 설정합니다.</p>
+          </div>
+          <div id="books-list" class="admin-list"></div>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="hero">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Hero Section</p>
+            <h2>히어로 노출 관리</h2>
+            <p class="admin-muted">선택된 단 한 권만 랜딩 히어로에 노출됩니다.</p>
+          </div>
+        </div>
+        <form class="admin-card admin-form admin-form--stacked" id="hero-form">
+          <label>히어로로 노출할 책 선택 (미선택 시 비노출)
+            <select id="hero-book">
+              <option value="">선택 안 함</option>
+            </select>
+          </label>
+          <label>히어로 뱃지 텍스트
+            <input type="text" id="hero-badge" placeholder="밀리의서재 어린이 베스트 주간 1위">
+          </label>
+          <div class="admin-form__actions">
+            <button class="button primary" type="submit">저장</button>
+            <button class="button ghost" type="button" id="clear-hero">히어로 비노출</button>
+          </div>
+          <p class="admin-error" id="hero-error"></p>
+        </form>
+        <div class="admin-card">
+          <h3>현재 히어로 노출</h3>
+          <p class="admin-muted" id="hero-current">로딩 중...</p>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="results">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Results Section</p>
+            <h2>성과 섹션 관리</h2>
+            <p class="admin-muted">성과가 있는 책만 노출되며 순서를 직접 정합니다.</p>
+          </div>
+        </div>
+        <form class="admin-card admin-form admin-form--stacked" id="results-form">
+          <div class="admin-form__grid">
+            <label>책 선택
+              <select id="results-book" required>
+                <option value="">책을 선택하세요</option>
+              </select>
+            </label>
+            <label>노출 순서
+              <input type="number" id="results-order" min="1" step="1" value="1">
+            </label>
+          </div>
+          <label>성과 문구
+            <textarea id="results-copy" rows="2" placeholder="성과 문구를 입력하세요"></textarea>
+          </label>
+          <label class="admin-checkbox">
+            <input type="checkbox" id="results-enabled" checked>
+            <span>노출 ON</span>
+          </label>
+          <div class="admin-form__actions">
+            <button class="button primary" type="submit">추가 / 업데이트</button>
+          </div>
+          <p class="admin-error" id="results-error"></p>
+        </form>
+        <div class="admin-card">
+          <div class="admin-list__header">
+            <h3>성과 노출 책</h3>
+            <p class="admin-muted">여러 권을 선택할 수 있습니다.</p>
+          </div>
+          <div id="results-list" class="admin-list"></div>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="library">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Library Section</p>
+            <h2>서재 노출 관리</h2>
+            <p class="admin-muted">서재에 보여줄 책을 선택하고 순서를 정하세요.</p>
+          </div>
+        </div>
+        <form class="admin-card admin-form admin-form--stacked" id="library-form">
+          <div class="admin-form__grid">
+            <label>책 선택
+              <select id="library-book" required>
+                <option value="">책을 선택하세요</option>
+              </select>
+            </label>
+            <label>노출 순서
+              <input type="number" id="library-order" min="1" step="1" value="1">
+            </label>
+          </div>
+          <label class="admin-checkbox">
+            <input type="checkbox" id="library-enabled" checked>
+            <span>노출 ON</span>
+          </label>
+          <div class="admin-form__actions">
+            <button class="button primary" type="submit">추가 / 업데이트</button>
+          </div>
+          <p class="admin-error" id="library-error"></p>
+        </form>
+        <div class="admin-card">
+          <div class="admin-list__header">
+            <h3>서재 노출 책</h3>
+            <p class="admin-muted">보여주고 싶은 책만 선택하세요.</p>
+          </div>
+          <div id="library-list" class="admin-list"></div>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="inquiries">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Inquiries</p>
+            <h2>문의 관리</h2>
+            <p class="admin-muted">문의 내역을 확인하고 답변 상태를 업데이트하세요.</p>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="admin-list__header">
+            <h3>문의 목록</h3>
+            <p class="admin-muted">최근 문의부터 표시됩니다.</p>
+          </div>
+          <div id="inquiries-list" class="admin-list"></div>
+        </div>
+      </section>
+
+      <section class="admin-section is-hidden" data-section="settings">
+        <div class="admin-section__header">
+          <div>
+            <p class="eyebrow">Site Settings</p>
+            <h2>팝업 & 히어로 설정</h2>
+            <p class="admin-muted">팝업 노출과 히어로 정보를 관리합니다.</p>
+          </div>
+        </div>
+        <form class="admin-card admin-form admin-form--stacked" id="popup-form">
+          <label class="admin-checkbox">
+            <input type="checkbox" id="popup-enabled">
+            <span>팝업 ON</span>
+          </label>
+          <label>팝업 제목
+            <input type="text" id="popup-title" placeholder="팝업 제목">
+          </label>
+          <label>팝업 내용
+            <textarea id="popup-body" rows="3" placeholder="팝업 내용을 입력하세요"></textarea>
+          </label>
+          <label>팝업 링크
+            <input type="url" id="popup-link" placeholder="https://">
+          </label>
+          <div class="admin-form__actions">
+            <button class="button primary" type="submit">팝업 설정 저장</button>
+          </div>
+          <p class="admin-error" id="popup-error"></p>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabaseUrl = window.SUPABASE_URL || localStorage.getItem('supabaseUrl') || 'https://your-supabase-project.supabase.co';
+    const supabaseAnonKey = window.SUPABASE_ANON_KEY || localStorage.getItem('supabaseAnonKey') || 'public-anon-key';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    const SITE_SETTINGS_ID = 1;
+    const COVER_BUCKET = 'book-covers';
+
+    const adminMenu = document.getElementById('admin-menu');
+    const sections = document.querySelectorAll('.admin-section');
+    const adminUser = document.getElementById('admin-user');
+    const logoutButton = document.getElementById('logout-button');
+
+    function setActiveSection(target) {
+      sections.forEach((section) => {
+        section.classList.toggle('is-hidden', section.dataset.section !== target);
+      });
+      adminMenu.querySelectorAll('.admin-menu__item').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.dataset.target === target);
+      });
+    }
+
+    adminMenu.addEventListener('click', (event) => {
+      if (event.target.matches('.admin-menu__item')) {
+        setActiveSection(event.target.dataset.target);
+      }
+    });
+
+    logoutButton.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = '/admin/login.html';
+    });
+
+    async function requireAdmin() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const session = sessionData?.session;
+      if (!session) {
+        window.location.href = '/admin/login.html';
+        return null;
+      }
+
+      const userId = session.user.id;
+      const { data: adminRows, error } = await supabase
+        .from('allowed_admins')
+        .select('user_id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error || !adminRows) {
+        window.location.href = '/admin/login.html';
+        return null;
+      }
+
+      adminUser.textContent = session.user.email;
+      return session.user;
+    }
+
+    function parseLinks(textValue) {
+      return textValue
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [label, url] = line.split('|').map((item) => item.trim());
+          return { label, url };
+        });
+    }
+
+    function renderLinks(links) {
+      if (!links || links.length === 0) return '<span class="admin-muted">링크 없음</span>';
+      return links
+        .map((link) => `<span class="pill">${link.label}</span>`)
+        .join(' ');
+    }
+
+    async function refreshDashboardMetrics(books, hero, results, library) {
+      document.getElementById('metric-books').textContent = books.length;
+      document.getElementById('metric-hero').textContent = hero?.title || '비노출';
+      document.getElementById('metric-results').textContent = results.filter((item) => item.enabled).length;
+      document.getElementById('metric-library').textContent = library.filter((item) => item.enabled).length;
+    }
+
+    async function loadBooks() {
+      const { data, error } = await supabase.from('books').select('*').order('created_at', { ascending: false });
+      if (error) {
+        document.getElementById('book-error').textContent = error.message;
+        return [];
+      }
+      const list = document.getElementById('books-list');
+      list.innerHTML = '';
+      data.forEach((book) => {
+        const item = document.createElement('div');
+        item.className = 'admin-list__item';
+        item.innerHTML = `
+          <div>
+            <p class="admin-list__title">${book.title}</p>
+            <p class="admin-muted">${book.author}</p>
+            <div class="admin-inline">${renderLinks(book.book_links)}</div>
+          </div>
+          <div class="admin-actions">
+            <button class="button secondary" data-edit="${book.id}">수정</button>
+            <button class="button ghost" data-delete="${book.id}">삭제</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      return data;
+    }
+
+    async function uploadCover(file) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const { data, error } = await supabase.storage.from(COVER_BUCKET).upload(fileName, file, {
+        contentType: file.type,
+        upsert: false,
+      });
+      if (error) throw error;
+      const { data: publicUrl } = supabase.storage.from(COVER_BUCKET).getPublicUrl(data.path);
+      return publicUrl.publicUrl;
+    }
+
+    function setBookForm(book) {
+      document.getElementById('book-id').value = book?.id || '';
+      document.getElementById('book-title').value = book?.title || '';
+      document.getElementById('book-author').value = book?.author || '';
+      document.getElementById('book-description').value = book?.description || '';
+      document.getElementById('book-cover').value = book?.cover_image_url || '';
+      document.getElementById('book-published').value = book?.published_at?.split('T')[0] || '';
+      document.getElementById('book-links').value = (book?.book_links || [])
+        .map((link) => `${link.label} | ${link.url}`)
+        .join('\n');
+    }
+
+    async function handleBookForm(event) {
+      event.preventDefault();
+      document.getElementById('book-error').textContent = '';
+      const formData = new FormData(event.target);
+      const id = formData.get('id');
+      const payload = {
+        title: formData.get('title'),
+        author: formData.get('author'),
+        description: formData.get('description'),
+        cover_image_url: formData.get('cover_image_url'),
+        published_at: formData.get('published_at') || null,
+        book_links: parseLinks(formData.get('book_links') || ''),
+      };
+
+      if (id) {
+        const { error } = await supabase.from('books').update(payload).eq('id', id);
+        if (error) {
+          document.getElementById('book-error').textContent = error.message;
+          return;
+        }
+      } else {
+        const { error } = await supabase.from('books').insert(payload);
+        if (error) {
+          document.getElementById('book-error').textContent = error.message;
+          return;
+        }
+      }
+
+      setBookForm(null);
+      await bootstrap();
+    }
+
+    async function handleBookActions(event) {
+      if (event.target.dataset.edit) {
+        const id = event.target.dataset.edit;
+        const { data } = await supabase.from('books').select('*').eq('id', id).single();
+        setBookForm(data);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (event.target.dataset.delete) {
+        const id = event.target.dataset.delete;
+        const { error } = await supabase.from('books').delete().eq('id', id);
+        if (error) {
+          document.getElementById('book-error').textContent = error.message;
+          return;
+        }
+        await bootstrap();
+      }
+    }
+
+    async function loadHero(books) {
+      const heroSelect = document.getElementById('hero-book');
+      heroSelect.innerHTML = '<option value="">선택 안 함</option>';
+      books.forEach((book) => {
+        const option = document.createElement('option');
+        option.value = book.id;
+        option.textContent = book.title;
+        heroSelect.appendChild(option);
+      });
+
+      const { data } = await supabase.from('site_settings').select('*').eq('id', SITE_SETTINGS_ID).maybeSingle();
+      if (data) {
+        if (data.hero_book_id) heroSelect.value = data.hero_book_id;
+        document.getElementById('hero-badge').value = data.hero_badge_text || '';
+        document.getElementById('hero-current').textContent = data.hero_book_id
+          ? `${books.find((book) => book.id === data.hero_book_id)?.title || '선택한 책 없음'}
+             ${data.hero_badge_text ? ` / ${data.hero_badge_text}` : ''}`
+          : '히어로에 노출된 책이 없습니다.';
+      } else {
+        document.getElementById('hero-current').textContent = '히어로에 노출된 책이 없습니다.';
+      }
+    }
+
+    async function saveHero(event) {
+      event.preventDefault();
+      const heroBookId = document.getElementById('hero-book').value || null;
+      const badge = document.getElementById('hero-badge').value;
+      const { error } = await supabase.from('site_settings').upsert({
+        id: SITE_SETTINGS_ID,
+        hero_book_id: heroBookId,
+        hero_badge_text: badge,
+      });
+      if (error) {
+        document.getElementById('hero-error').textContent = error.message;
+        return;
+      }
+      await bootstrap();
+    }
+
+    async function clearHero() {
+      const { error } = await supabase.from('site_settings').update({ hero_book_id: null, hero_badge_text: null }).eq('id', SITE_SETTINGS_ID);
+      if (error) {
+        document.getElementById('hero-error').textContent = error.message;
+        return;
+      }
+      await bootstrap();
+    }
+
+    function populateBookOptions(selectId, books) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = '<option value="">책을 선택하세요</option>';
+      books.forEach((book) => {
+        const option = document.createElement('option');
+        option.value = book.id;
+        option.textContent = book.title;
+        select.appendChild(option);
+      });
+    }
+
+    async function loadResultEntries() {
+      const { data, error } = await supabase.from('results_entries').select('*, books(title)').order('display_order');
+      if (error) {
+        document.getElementById('results-error').textContent = error.message;
+        return [];
+      }
+      const list = document.getElementById('results-list');
+      list.innerHTML = '';
+      data.forEach((entry) => {
+        const item = document.createElement('div');
+        item.className = 'admin-list__item';
+        item.innerHTML = `
+          <div>
+            <p class="admin-list__title">${entry.books?.title || entry.book_id}</p>
+            <p class="admin-muted">순서 ${entry.display_order}</p>
+            <p class="admin-muted">${entry.copy || ''}</p>
+          </div>
+          <div class="admin-actions">
+            <button class="button secondary" data-edit-result="${entry.id}">수정</button>
+            <button class="button ghost" data-delete-result="${entry.id}">삭제</button>
+            <span class="pill pill--muted">${entry.enabled ? 'ON' : 'OFF'}</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      return data;
+    }
+
+    async function loadLibraryEntries() {
+      const { data, error } = await supabase.from('library_entries').select('*, books(title)').order('display_order');
+      if (error) {
+        document.getElementById('library-error').textContent = error.message;
+        return [];
+      }
+      const list = document.getElementById('library-list');
+      list.innerHTML = '';
+      data.forEach((entry) => {
+        const item = document.createElement('div');
+        item.className = 'admin-list__item';
+        item.innerHTML = `
+          <div>
+            <p class="admin-list__title">${entry.books?.title || entry.book_id}</p>
+            <p class="admin-muted">순서 ${entry.display_order}</p>
+          </div>
+          <div class="admin-actions">
+            <button class="button secondary" data-edit-library="${entry.id}">수정</button>
+            <button class="button ghost" data-delete-library="${entry.id}">삭제</button>
+            <span class="pill pill--muted">${entry.enabled ? 'ON' : 'OFF'}</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      return data;
+    }
+
+    async function loadInquiries() {
+      const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false });
+      if (error) {
+        document.getElementById('popup-error').textContent = error.message;
+        return [];
+      }
+      const list = document.getElementById('inquiries-list');
+      list.innerHTML = '';
+      data.forEach((inquiry) => {
+        const item = document.createElement('div');
+        item.className = 'admin-list__item admin-list__item--column';
+        item.innerHTML = `
+          <div class="admin-list__meta">
+            <p class="admin-list__title">${inquiry.name} (${inquiry.email})</p>
+            <p class="admin-muted">${new Date(inquiry.created_at).toLocaleString()}</p>
+            <p>${inquiry.message}</p>
+          </div>
+          <div class="admin-actions admin-actions--stacked">
+            <a class="button secondary" href="mailto:${inquiry.email}?subject=[elliebooks]%20문의%20답변">답장하기</a>
+            <button class="button primary" data-replied="${inquiry.id}">답변 완료</button>
+            <span class="pill ${inquiry.reply_status === 'replied' ? 'pill--success' : 'pill--muted'}">${inquiry.reply_status || '미확인'}</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      return data;
+    }
+
+    async function saveResultEntry(event) {
+      event.preventDefault();
+      const bookId = document.getElementById('results-book').value;
+      const order = Number(document.getElementById('results-order').value || 1);
+      const copy = document.getElementById('results-copy').value;
+      const enabled = document.getElementById('results-enabled').checked;
+
+      const { data: existing } = await supabase
+        .from('results_entries')
+        .select('id')
+        .eq('book_id', bookId)
+        .maybeSingle();
+
+      const payload = { book_id: bookId, display_order: order, copy, enabled };
+      const query = existing?.id
+        ? supabase.from('results_entries').update(payload).eq('id', existing.id)
+        : supabase.from('results_entries').insert(payload);
+
+      const { error } = await query;
+      if (error) {
+        document.getElementById('results-error').textContent = error.message;
+        return;
+      }
+
+      document.getElementById('results-form').reset();
+      document.getElementById('results-enabled').checked = true;
+      await bootstrap();
+    }
+
+    async function saveLibraryEntry(event) {
+      event.preventDefault();
+      const bookId = document.getElementById('library-book').value;
+      const order = Number(document.getElementById('library-order').value || 1);
+      const enabled = document.getElementById('library-enabled').checked;
+
+      const { data: existing } = await supabase
+        .from('library_entries')
+        .select('id')
+        .eq('book_id', bookId)
+        .maybeSingle();
+
+      const payload = { book_id: bookId, display_order: order, enabled };
+      const query = existing?.id
+        ? supabase.from('library_entries').update(payload).eq('id', existing.id)
+        : supabase.from('library_entries').insert(payload);
+
+      const { error } = await query;
+      if (error) {
+        document.getElementById('library-error').textContent = error.message;
+        return;
+      }
+
+      document.getElementById('library-form').reset();
+      document.getElementById('library-enabled').checked = true;
+      await bootstrap();
+    }
+
+    async function handleResultActions(event) {
+      if (event.target.dataset.deleteResult) {
+        const id = event.target.dataset.deleteResult;
+        await supabase.from('results_entries').delete().eq('id', id);
+        await bootstrap();
+      }
+      if (event.target.dataset.editResult) {
+        const id = event.target.dataset.editResult;
+        const { data } = await supabase.from('results_entries').select('*').eq('id', id).single();
+        document.getElementById('results-book').value = data.book_id;
+        document.getElementById('results-order').value = data.display_order;
+        document.getElementById('results-copy').value = data.copy || '';
+        document.getElementById('results-enabled').checked = data.enabled;
+        setActiveSection('results');
+      }
+    }
+
+    async function handleLibraryActions(event) {
+      if (event.target.dataset.deleteLibrary) {
+        const id = event.target.dataset.deleteLibrary;
+        await supabase.from('library_entries').delete().eq('id', id);
+        await bootstrap();
+      }
+      if (event.target.dataset.editLibrary) {
+        const id = event.target.dataset.editLibrary;
+        const { data } = await supabase.from('library_entries').select('*').eq('id', id).single();
+        document.getElementById('library-book').value = data.book_id;
+        document.getElementById('library-order').value = data.display_order;
+        document.getElementById('library-enabled').checked = data.enabled;
+        setActiveSection('library');
+      }
+    }
+
+    async function markInquiryAsReplied(event) {
+      if (!event.target.dataset.replied) return;
+      const id = event.target.dataset.replied;
+      await supabase.from('inquiries').update({ reply_status: 'replied', replied_at: new Date().toISOString() }).eq('id', id);
+      await bootstrap();
+    }
+
+    async function loadPopupSettings() {
+      const { data } = await supabase.from('site_settings').select('*').eq('id', SITE_SETTINGS_ID).maybeSingle();
+      if (data) {
+        document.getElementById('popup-enabled').checked = !!data.popup_enabled;
+        document.getElementById('popup-title').value = data.popup_title || '';
+        document.getElementById('popup-body').value = data.popup_body || '';
+        document.getElementById('popup-link').value = data.popup_link || '';
+      }
+    }
+
+    async function savePopup(event) {
+      event.preventDefault();
+      const payload = {
+        id: SITE_SETTINGS_ID,
+        popup_enabled: document.getElementById('popup-enabled').checked,
+        popup_title: document.getElementById('popup-title').value,
+        popup_body: document.getElementById('popup-body').value,
+        popup_link: document.getElementById('popup-link').value,
+      };
+      const { error } = await supabase.from('site_settings').upsert(payload);
+      if (error) {
+        document.getElementById('popup-error').textContent = error.message;
+        return;
+      }
+    }
+
+    async function bootstrap() {
+      const books = await loadBooks();
+      populateBookOptions('results-book', books);
+      populateBookOptions('library-book', books);
+      await loadHero(books);
+      const results = await loadResultEntries();
+      const library = await loadLibraryEntries();
+      await loadInquiries();
+      await loadPopupSettings();
+      const { data: heroSetting } = await supabase.from('site_settings').select('*').eq('id', SITE_SETTINGS_ID).maybeSingle();
+      const heroBook = heroSetting ? books.find((book) => book.id === heroSetting.hero_book_id) : null;
+      await refreshDashboardMetrics(books, heroBook, results, library);
+    }
+
+    document.getElementById('book-form').addEventListener('submit', handleBookForm);
+    document.getElementById('books-list').addEventListener('click', handleBookActions);
+    document.getElementById('hero-form').addEventListener('submit', saveHero);
+    document.getElementById('clear-hero').addEventListener('click', clearHero);
+    document.getElementById('results-form').addEventListener('submit', saveResultEntry);
+    document.getElementById('results-list').addEventListener('click', handleResultActions);
+    document.getElementById('library-form').addEventListener('submit', saveLibraryEntry);
+    document.getElementById('library-list').addEventListener('click', handleLibraryActions);
+    document.getElementById('inquiries-list').addEventListener('click', markInquiryAsReplied);
+    document.getElementById('popup-form').addEventListener('submit', savePopup);
+    document.getElementById('reset-book').addEventListener('click', () => setBookForm(null));
+    document.getElementById('new-book').addEventListener('click', () => setBookForm(null));
+    document.getElementById('book-cover-upload').addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const url = await uploadCover(file);
+        document.getElementById('book-cover').value = url;
+      } catch (error) {
+        document.getElementById('book-error').textContent = error.message;
+      }
+    });
+
+    await requireAdmin();
+    await bootstrap();
+  </script>
+</body>
+</html>
