@@ -1,0 +1,44 @@
+<svg width="620" height="820" viewBox="0 0 620 820" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">무지개 방으로 초대합니다 책 표지</title>
+  <desc id="desc">무지개 색상과 창문이 그려진 책 표지를 단순화한 그림</desc>
+  <defs>
+    <linearGradient id="cover" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8fd3f4" />
+      <stop offset="50%" stop-color="#fef568" />
+      <stop offset="100%" stop-color="#f3a6ff" />
+    </linearGradient>
+    <linearGradient id="spine" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#fef9c3" />
+      <stop offset="100%" stop-color="#fbd38d" />
+    </linearGradient>
+    <linearGradient id="badge" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff7d0" />
+      <stop offset="100%" stop-color="#fef08a" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="rgba(0,0,0,0.18)" />
+    </filter>
+  </defs>
+  <rect x="80" y="50" width="420" height="720" rx="18" fill="#fff" filter="url(#shadow)" />
+  <rect x="100" y="70" width="360" height="680" rx="16" fill="url(#cover)" />
+  <rect x="100" y="70" width="48" height="680" rx="14" fill="url(#spine)" />
+  <rect x="118" y="102" width="14" height="120" rx="7" fill="#f8d34c" opacity="0.8" />
+  <rect x="118" y="252" width="14" height="420" rx="7" fill="#f8d34c" opacity="0.45" />
+  <circle cx="380" cy="180" r="92" fill="rgba(255,255,255,0.65)" />
+  <circle cx="380" cy="180" r="74" fill="rgba(255,255,255,0.55)" />
+  <rect x="260" y="140" width="260" height="140" rx="18" fill="#fff" opacity="0.75" />
+  <rect x="280" y="160" width="220" height="100" rx="14" fill="url(#badge)" stroke="#f1c40f" stroke-width="3" opacity="0.96" />
+  <text x="390" y="210" font-family="'Noto Sans KR', sans-serif" font-size="26" font-weight="700" fill="#7c3aed" text-anchor="middle">무지개 방으로</text>
+  <text x="390" y="243" font-family="'Noto Sans KR', sans-serif" font-size="24" font-weight="700" fill="#7c3aed" text-anchor="middle">초대합니다</text>
+  <rect x="180" y="360" width="300" height="240" rx="16" fill="#fff" opacity="0.85" />
+  <rect x="200" y="380" width="260" height="200" rx="14" fill="#fef3c7" stroke="#f5c16c" stroke-width="4" />
+  <path d="M220 540 C250 500 280 520 310 480 C340 440 360 470 390 430" stroke="#f97316" stroke-width="8" fill="none" stroke-linecap="round" />
+  <path d="M220 500 C250 460 280 480 310 440 C340 400 360 430 390 390" stroke="#22c55e" stroke-width="8" fill="none" stroke-linecap="round" />
+  <path d="M220 460 C250 420 280 440 310 400 C340 360 360 390 390 350" stroke="#3b82f6" stroke-width="8" fill="none" stroke-linecap="round" />
+  <rect x="208" y="610" width="200" height="12" rx="6" fill="#fff" opacity="0.9" />
+  <rect x="208" y="632" width="240" height="12" rx="6" fill="#fff" opacity="0.9" />
+  <rect x="208" y="654" width="220" height="12" rx="6" fill="#fff" opacity="0.9" />
+  <circle cx="450" cy="610" r="18" fill="#22c55e" opacity="0.9" />
+  <path d="M443 609 l6 6 l14 -14" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" />
+  <text x="152" y="760" font-family="'Noto Sans KR', sans-serif" font-size="18" font-weight="600" fill="#4b5563">ELLIEBOOKS</text>
+</svg>
