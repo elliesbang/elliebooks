@@ -54,10 +54,10 @@
 
   <script type="module">
     import { createClient } from
-      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
     /* =========================
-       Supabase 환경변수 (안전 처리)
+       Supabase ENV
     ========================= */
     const supabaseUrl =
       window.SUPABASE_URL ||
@@ -68,22 +68,28 @@
       import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error("Supabase 환경변수가 설정되지 않았습니다.");
-      throw new Error("Supabase 환경변수 누락");
+      throw new Error("Supabase 환경변수가 설정되지 않았습니다.");
     }
 
     /* =========================
-       Supabase Client
-       ❗ storage 접근 완전 차단
+       ❗ Storage 완전 차단
+       (이게 핵심)
     ========================= */
+    const memoryStorage = {
+      getItem: () => null,
+      setItem: () => {},
+      removeItem: () => {}
+    };
+
     const supabase = createClient(
       supabaseUrl,
       supabaseAnonKey,
       {
         auth: {
-          persistSession: false,     // 🔥 핵심 수정
+          persistSession: false,
           autoRefreshToken: false,
-          detectSessionInUrl: false
+          detectSessionInUrl: false,
+          storage: memoryStorage   // 🔥 핵심
         }
       }
     );
@@ -91,11 +97,8 @@
     const form = document.getElementById("login-form");
     const errorEl = document.getElementById("login-error");
 
-    /* =========================
-       Login Submit
-    ========================= */
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       errorEl.textContent = "";
 
       const formData = new FormData(form);
@@ -119,10 +122,10 @@
           return;
         }
 
-        // ✅ 로그인 성공 → 관리자 대시보드 이동
+        // 로그인 성공
         window.location.replace("/admin/");
       } catch (err) {
-        console.error("login error:", err);
+        console.error(err);
         errorEl.textContent = "로그인 중 오류가 발생했습니다.";
       }
     });
