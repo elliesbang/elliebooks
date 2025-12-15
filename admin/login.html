@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>elliebooks 관리자 로그인</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
     rel="stylesheet"
   />
+
   <link rel="stylesheet" href="/styles.css" />
 </head>
 
@@ -26,7 +28,7 @@
         </p>
       </div>
 
-      <form id="login-form" class="admin-form">
+      <form id="login-form" class="admin-form" novalidate>
         <label>
           이메일
           <input type="email" name="email" required />
@@ -37,11 +39,14 @@
           <input type="password" name="password" required />
         </label>
 
-        <button class="button primary" type="submit">로그인</button>
+        <button class="button primary" type="submit">
+          로그인
+        </button>
 
         <p class="admin-hint">
           허용된 관리자만 접근 가능합니다.
         </p>
+
         <p class="admin-error" id="login-error" role="alert"></p>
       </form>
     </section>
@@ -51,51 +56,74 @@
     import { createClient } from
       'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    // ✅ Cloudflare Pages 환경변수만 사용
-    const supabaseUrl = window.SUPABASE_URL;
-    const supabaseAnonKey = window.SUPABASE_ANON_KEY;
+    /* =========================
+       Supabase 환경변수 (안전 처리)
+    ========================= */
+    const supabaseUrl =
+      window.SUPABASE_URL ||
+      import.meta.env?.VITE_SUPABASE_URL;
+
+    const supabaseAnonKey =
+      window.SUPABASE_ANON_KEY ||
+      import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Supabase 환경변수가 설정되지 않았습니다.');
+      console.error("Supabase 환경변수가 설정되지 않았습니다.");
+      throw new Error("Supabase 환경변수 누락");
     }
 
+    /* =========================
+       Supabase Client
+       ❗ storage 접근 완전 차단
+    ========================= */
     const supabase = createClient(
       supabaseUrl,
       supabaseAnonKey,
       {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true,
+          persistSession: false,     // 🔥 핵심 수정
+          autoRefreshToken: false,
           detectSessionInUrl: false
         }
       }
     );
 
-    const form = document.getElementById('login-form');
-    const errorEl = document.getElementById('login-error');
+    const form = document.getElementById("login-form");
+    const errorEl = document.getElementById("login-error");
 
-    form.addEventListener('submit', async (event) => {
+    /* =========================
+       Login Submit
+    ========================= */
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      errorEl.textContent = '';
+      errorEl.textContent = "";
 
       const formData = new FormData(form);
-      const email = formData.get('email');
-      const password = formData.get('password');
+      const email = formData.get("email");
+      const password = formData.get("password");
+
+      if (!email || !password) {
+        errorEl.textContent = "이메일과 비밀번호를 입력해주세요.";
+        return;
+      }
 
       try {
         const { error } =
-          await supabase.auth.signInWithPassword({ email, password });
+          await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
 
         if (error) {
           errorEl.textContent = error.message;
           return;
         }
 
-        // ✅ 로그인 성공 후 이동
-        window.location.href = '/admin/';
+        // ✅ 로그인 성공 → 관리자 대시보드 이동
+        window.location.replace("/admin/");
       } catch (err) {
-        errorEl.textContent = '로그인 중 오류가 발생했습니다.';
-        console.error(err);
+        console.error("login error:", err);
+        errorEl.textContent = "로그인 중 오류가 발생했습니다.";
       }
     });
   </script>
