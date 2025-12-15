@@ -1,11 +1,18 @@
 @media (max-width: 768px) {
+
+  /* =========================
+     1. 데스크톱 내비 완전 숨김
+  ========================== */
   header nav,
-  .header-right,
+  .gnb,
   .top-menu,
-  .gnb {
+  .header-right {
     display: none !important;
   }
 
+  /* =========================
+     2. 헤더 기본 구조
+  ========================== */
   header {
     display: flex;
     align-items: center;
@@ -14,15 +21,16 @@
     height: auto;
     min-height: 56px;
     padding: 12px 16px;
-    box-sizing: border-box;
 
     position: sticky;
     top: 0;
     z-index: 1000;
+
     background: #ffffff;
-    overflow: visible;
+    box-sizing: border-box;
   }
 
+  /* 햄버거 버튼 */
   .hamburger {
     display: block;
     font-size: 24px;
@@ -31,17 +39,23 @@
     cursor: pointer;
   }
 
+  /* =========================
+     3. 모바일 슬라이드 메뉴
+  ========================== */
   .mobile-menu {
     position: fixed;
     top: 0;
     left: 0;
+
     width: 80%;
     height: 100vh;
+
     background: #ffffff;
+    padding: 24px;
+
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     z-index: 1200;
-    padding: 24px;
   }
 
   body.menu-open .mobile-menu {
@@ -52,17 +66,14 @@
     overflow-x: hidden;
   }
 
-  main,
-  .hero,
-  .hero img {
+  /* =========================
+     4. 메인 / 컨테이너
+  ========================== */
+  main {
     width: 100%;
     max-width: 100%;
-    margin: 0;
-  }
-
-  main {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
 
   .container,
@@ -72,12 +83,66 @@
     margin: 0;
   }
 
+  /* =========================
+     5. 히어로 섹션 (핵심)
+  ========================== */
+  .hero {
+    width: 100%;
+    height: auto;
+    min-height: auto;
+
+    padding: 72px 16px 64px;
+    box-sizing: border-box;
+
+    background-position: center top;
+    background-size: cover;
+  }
+
+  /* 히어로 이미지가 img 태그일 경우 */
+  .hero img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* 히어로 타이틀 */
+  .hero h1,
+  .hero-title {
+    font-size: 32px;
+    line-height: 1.3;
+    word-break: keep-all;
+    margin-bottom: 16px;
+  }
+
+  /* 히어로 서브텍스트 */
+  .hero p,
+  .hero-subtitle {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  /* 히어로 버튼 */
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* =========================
+     6. 하단 내비 (앱용이면 숨김)
+  ========================== */
   .bottom-nav,
   .mobile-nav {
     display: none !important;
   }
 
+  /* =========================
+     7. 푸터 (✔ 다시 노출)
+  ========================== */
   footer {
-    display: none;
+    display: block;
+    padding: 40px 16px;
   }
+
 }
