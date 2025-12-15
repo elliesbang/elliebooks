@@ -53,52 +53,13 @@
   </main>
 
   <script type="module">
-    import { createClient } from
-      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-    /* =========================
-       Supabase ENV
-    ========================= */
-    const supabaseUrl =
-      window.SUPABASE_URL ||
-      import.meta.env?.VITE_SUPABASE_URL;
-
-    const supabaseAnonKey =
-      window.SUPABASE_ANON_KEY ||
-      import.meta.env?.VITE_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error("Supabase 환경변수가 설정되지 않았습니다.");
-    }
-
-    /* =========================
-       ❗ Storage 완전 차단
-       (이게 핵심)
-    ========================= */
-    const memoryStorage = {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {}
-    };
-
-    const supabase = createClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: memoryStorage   // 🔥 핵심
-        }
-      }
-    );
+    import { supabase } from "/lib/supabaseClient.js";
 
     const form = document.getElementById("login-form");
     const errorEl = document.getElementById("login-error");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
       errorEl.textContent = "";
 
       const formData = new FormData(form);
@@ -111,19 +72,18 @@
       }
 
       try {
-        const { error } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
         if (error) {
           errorEl.textContent = error.message;
           return;
         }
 
-        // 로그인 성공
-        window.location.replace("/admin/");
+        // ✅ 로그인 성공 → 관리자 대시보드
+        window.location.href = "/admin/";
       } catch (err) {
         console.error(err);
         errorEl.textContent = "로그인 중 오류가 발생했습니다.";
