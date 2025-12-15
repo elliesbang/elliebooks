@@ -53,9 +53,13 @@ header.header {
   letter-spacing: 0.02em;
 }
 
-.nav {
+.nav { 
   display: flex;
   gap: 20px;
+}
+
+.hamburger {
+  display: none;
 }
 
 .nav a {
