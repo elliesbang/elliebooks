@@ -21,12 +21,28 @@
   <!-- ===== HEADER ===== -->
   <header class="header">
     <a class="logo" href="/">elliebooks</a>
+    <button class="hamburger" type="button" aria-label="메뉴 열기" aria-expanded="false">
+      ☰
+    </button>
     <nav class="nav">
       <a href="#intro">소개</a>
       <a href="#library">서재</a>
       <a href="#programs">프로그램</a>
       <a href="#contact">문의</a>
     </nav>
+    <div class="mobile-menu" aria-hidden="true">
+      <div class="mobile-menu__header">
+        <span class="mobile-menu__brand">elliebooks</span>
+        <button class="mobile-menu__close" type="button" aria-label="메뉴 닫기">✕</button>
+      </div>
+      <nav class="mobile-menu__nav">
+        <a href="#intro">소개</a>
+        <a href="#library">서재</a>
+        <a href="#programs">프로그램</a>
+        <a href="#contact">문의</a>
+      </nav>
+    </div>
+    <div class="mobile-menu__overlay" aria-hidden="true"></div>
   </header>
 
   <!-- ===== MAIN (여기에 페이지 콘텐츠가 들어감) ===== -->
@@ -65,19 +81,35 @@
         console.error(err);
       });
   </script>
-
-  <!-- ===== 모바일 하단 내비 ===== -->
   <script>
-    if (
-      window.matchMedia("(max-width: 768px)").matches &&
-      !document.querySelector(".mobile-bottom-nav")
-    ) {
-      fetch("/mobile-nav.html")
-        .then(res => res.text())
-        .then(html => {
-          document.body.insertAdjacentHTML("beforeend", html);
-        });
-    }
+    const body = document.body;
+    const hamburger = document.querySelector('.hamburger');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const mobileClose = document.querySelector('.mobile-menu__close');
+    const mobileOverlay = document.querySelector('.mobile-menu__overlay');
+
+    const toggleMenu = (open) => {
+      const isOpen = open ?? !body.classList.contains('menu-open');
+      body.classList.toggle('menu-open', isOpen);
+      mobileMenu?.setAttribute('aria-hidden', String(!isOpen));
+      hamburger?.setAttribute('aria-expanded', String(isOpen));
+    };
+
+    const closeMenu = () => toggleMenu(false);
+
+    hamburger?.addEventListener('click', () => toggleMenu());
+    mobileClose?.addEventListener('click', closeMenu);
+    mobileOverlay?.addEventListener('click', closeMenu);
+
+    mobileMenu?.querySelectorAll('a')?.forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        closeMenu();
+      }
+    });
   </script>
 </body>
 </html>
